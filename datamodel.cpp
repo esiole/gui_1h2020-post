@@ -10,15 +10,22 @@ QStringList DataModel::print()
     return stringList();
 }
 
-void DataModel::addValue(const QString &value)
+/**
+ * @brief DataModel::addValue
+ * @param value Добавляемое значение
+ * @return -1, если такого элемента нет в модели, иначе какое-то число
+ */
+int DataModel::addValue(const QString &value)
 {
     QStringList data = stringList();
-    if (data.indexOf(value) == -1)
+    int index = data.indexOf(value);
+    if (index == -1)
     {
         data.append(value);
         setStringList(data);
         emit layoutChanged();
     }
+    return index;
 }
 
 void DataModel::deleteValue(const QString &value)

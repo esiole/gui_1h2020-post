@@ -43,7 +43,7 @@ void MainWindow::dropEvent(QDropEvent *event)
     const QMimeData* mimeData = event->mimeData();
     if (mimeData->hasUrls())
     {
-        QList <QUrl> urlList = mimeData->urls();
+        QList<QUrl> urlList = mimeData->urls();
         for (int i = 0; i < urlList.size(); i++)
         {
             QString path = urlList.at(i).toLocalFile();
@@ -52,8 +52,11 @@ void MainWindow::dropEvent(QDropEvent *event)
 
             if (suffix == "mp3")
             {
-                dataModel->addValue(info->baseName());
-                playlist->addMedia(urlList.at(i));
+                int index = dataModel->addValue(info->baseName());
+                if (index == -1)
+                {
+                    playlist->addMedia(urlList.at(i));
+                }
                 if (player->isMetaDataAvailable())
                     QMessageBox::information(this, "", player->metaData(QMediaMetaData::Title).toString());
             }

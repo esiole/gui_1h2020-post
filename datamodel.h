@@ -17,7 +17,7 @@ public:
     QStringList print();
 
 public slots:
-    void addValue(const QString &value);
+    int addValue(const QString &value);
     void deleteValue(const QString &value);
 };
 
