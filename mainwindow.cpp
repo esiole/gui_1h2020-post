@@ -67,4 +67,5 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::doubleClickOnModelElement(const QModelIndex& index)
 {
     playlist->setCurrentIndex(index.row());
+    player->play();
 }
