@@ -16,10 +16,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listView->setModel(dataModel);
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    int volume = 100;
+    ui->sliderDuration->setValue(0);
+    ui->labelVolume->setText(QString::number(volume) + "%");
+    ui->sliderVolume->setValue(volume);
+    ui->sliderVolume->setTickPosition(QSlider::TickPosition::TicksRight);
+
     player = new QMediaPlayer(this);
     playlist = new QMediaPlaylist(this);
     player->setPlaylist(playlist);
-    player->setVolume(100);
+    player->setVolume(volume);
     playlist->setPlaybackMode(QMediaPlaylist::Loop);
 
     connect(ui->listView, &QListView::doubleClicked, this, &MainWindow::doubleClickOnModelElement);
@@ -30,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pauseButton, &QPushButton::clicked, player, &QMediaPlayer::pause);
     connect(ui->sliderDuration, &QSlider::sliderReleased, this, &MainWindow::moveSlider);
     connect(ui->delButton, &QPushButton::clicked, this, &MainWindow::deleteSong);
+    connect(ui->sliderVolume, &QSlider::valueChanged, this, &MainWindow::volumeChange);
 
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
@@ -144,6 +151,12 @@ void MainWindow::deleteSong()
         clearMetaInfo();
     }
     player->play();
+}
+
+void MainWindow::volumeChange(int volume)
+{
+    player->setVolume(volume);
+    ui->labelVolume->setText(QString::number(volume) + "%");
 }
 
 void MainWindow::calculationTime(QTime* time, qint64 millsec)

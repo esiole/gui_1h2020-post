@@ -39,6 +39,7 @@ public slots:
     void durationChange(qint64 duration);
     void moveSlider();
     void deleteSong();
+    void volumeChange(int volume);
 
 private:
     Ui::MainWindow *ui;
