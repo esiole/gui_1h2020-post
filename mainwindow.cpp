@@ -26,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->nextButton, &QPushButton::clicked, playlist, &QMediaPlaylist::next);
     connect(ui->prevButton, &QPushButton::clicked, playlist, &QMediaPlaylist::previous);
     connect(ui->pauseButton, &QPushButton::clicked, player, &QMediaPlayer::pause);
+
+    connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
+    connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
 }
 
 MainWindow::~MainWindow()
@@ -57,8 +60,6 @@ void MainWindow::dropEvent(QDropEvent *event)
                 {
                     playlist->addMedia(urlList.at(i));
                 }
-                if (player->isMetaDataAvailable())
-                    QMessageBox::information(this, "", player->metaData(QMediaMetaData::Title).toString());
             }
         }
     }
@@ -68,4 +69,18 @@ void MainWindow::doubleClickOnModelElement(const QModelIndex& index)
 {
     playlist->setCurrentIndex(index.row());
     player->play();
+}
+
+void MainWindow::setMetaInfo()
+{
+    ui->labelPlayer->setText(player->metaData(QMediaMetaData::Author).toString());
+    ui->labelTitle->setText(player->metaData(QMediaMetaData::Title).toString());
+    ui->labelAlbum->setText(player->metaData(QMediaMetaData::AlbumTitle).toString());
+    ui->labelYear->setText(player->metaData(QMediaMetaData::Year).toString());
+    ui->labelMaxDuration->setText(player->metaData(QMediaMetaData::Duration).toString());
+}
+
+void MainWindow::durationChange(qint64 duration)
+{
+    ui->labelCurrentDuration->setText(QString::number(duration));
 }

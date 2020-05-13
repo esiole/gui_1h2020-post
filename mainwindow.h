@@ -11,6 +11,7 @@
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
 #include <QMediaMetaData>
+#include <QDebug>
 #include <QMessageBox>
 
 #include "datamodel.h"
@@ -33,6 +34,8 @@ public:
 
 public slots:
     void doubleClickOnModelElement(const QModelIndex& index);
+    void setMetaInfo();
+    void durationChange(qint64 duration);
 
 private:
     Ui::MainWindow *ui;
