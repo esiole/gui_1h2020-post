@@ -37,6 +37,7 @@ public slots:
     void doubleClickOnModelElement(const QModelIndex& index);
     void setMetaInfo();
     void durationChange(qint64 duration);
+    void moveSlider();
 
 private:
     Ui::MainWindow *ui;

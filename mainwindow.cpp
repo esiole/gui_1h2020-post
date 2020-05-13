@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->nextButton, &QPushButton::clicked, playlist, &QMediaPlaylist::next);
     connect(ui->prevButton, &QPushButton::clicked, playlist, &QMediaPlaylist::previous);
     connect(ui->pauseButton, &QPushButton::clicked, player, &QMediaPlayer::pause);
+    connect(ui->sliderDuration, &QSlider::sliderReleased, this, &MainWindow::moveSlider);
 
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
@@ -110,6 +111,13 @@ void MainWindow::durationChange(qint64 duration)
         int value = static_cast<int>(current / static_cast<double>(max) * 100);
         ui->sliderDuration->setValue(value);
     }
+}
+
+void MainWindow::moveSlider()
+{
+    int value = ui->sliderDuration->sliderPosition();
+    int current = static_cast<int>(static_cast<double>(value) / 100 * maxMediaDuration->msecsSinceStartOfDay());
+    player->setPosition(current);
 }
 
 void MainWindow::calculationTime(QTime* time, qint64 millsec)
