@@ -38,6 +38,7 @@ public slots:
     void setMetaInfo();
     void durationChange(qint64 duration);
     void moveSlider();
+    void deleteSong();
 
 private:
     Ui::MainWindow *ui;
@@ -48,5 +49,6 @@ private:
     QTime* currentMediaDuration;
 
     void calculationTime(QTime* time, qint64 millsec);
+    void clearMetaInfo();
 };
 #endif // MAINWINDOW_H

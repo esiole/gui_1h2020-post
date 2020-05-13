@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->prevButton, &QPushButton::clicked, playlist, &QMediaPlaylist::previous);
     connect(ui->pauseButton, &QPushButton::clicked, player, &QMediaPlayer::pause);
     connect(ui->sliderDuration, &QSlider::sliderReleased, this, &MainWindow::moveSlider);
+    connect(ui->delButton, &QPushButton::clicked, this, &MainWindow::deleteSong);
 
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
@@ -120,10 +121,46 @@ void MainWindow::moveSlider()
     player->setPosition(current);
 }
 
+void MainWindow::deleteSong()
+{
+    QModelIndex index  = ui->listView->currentIndex();
+    int pos = dataModel->deleteValue(index);
+
+    // при удалении первого элемента в плейлисте
+    // воспроизведение останавливается;
+    // чтобы вернуться к игравшей до этого песне
+    if (pos == 0)
+    {
+        int currentSong = playlist->currentIndex();
+        playlist->removeMedia(pos);
+        playlist->setCurrentIndex(currentSong - 1);
+    }
+    else
+    {
+        playlist->removeMedia(pos);
+    }
+    if (playlist->mediaCount() == 0)
+    {
+        clearMetaInfo();
+    }
+    player->play();
+}
+
 void MainWindow::calculationTime(QTime* time, qint64 millsec)
 {
     int seconds = static_cast<int>(millsec / 1000);
     int minutes = seconds / 60;
     seconds = seconds % 60;
     time->setHMS(0, minutes, seconds, millsec % 1000);
+}
+
+void MainWindow::clearMetaInfo()
+{
+    ui->labelPlayer->setText("");
+    ui->labelTitle->setText("");
+    ui->labelAlbum->setText("");
+    ui->labelYear->setText("");
+    ui->labelMaxDuration->setText("");
+    ui->labelCurrentDuration->setText("");
+    ui->sliderDuration->setValue(0);
 }

@@ -25,15 +25,15 @@ int DataModel::addValue(const QString &value)
 
 /**
  * @brief DataModel::deleteValue
- * @param value Удаляемое значение
+ * @param index Индекс удаляемого элемента
+ * @return Позиция удаляемого элемента в списке
  */
-void DataModel::deleteValue(const QString &value)
+int DataModel::deleteValue(const QModelIndex &index)
 {
     QStringList data = stringList();
-    if (data.indexOf(value) != -1)
-    {
-        data.removeAt(data.indexOf(value));
-        setStringList(data);
-        emit layoutChanged();
-    }
+    int pos = index.row();
+    data.removeAt(pos);
+    setStringList(data);
+    emit layoutChanged();
+    return pos;
 }
