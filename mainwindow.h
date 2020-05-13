@@ -42,6 +42,7 @@ public slots:
     void deleteSong();
     void volumeChange(int volume);
     void openFiles();
+    void clearPlaylist();
 
 private:
     Ui::MainWindow *ui;

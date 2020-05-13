@@ -247,12 +247,24 @@
     </property>
     <addaction name="openFilesAction"/>
    </widget>
+   <widget class="QMenu" name="menuPlaylist">
+    <property name="title">
+     <string>Плейлист</string>
+    </property>
+    <addaction name="clearAction"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuPlaylist"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="openFilesAction">
    <property name="text">
     <string>Открыть</string>
+   </property>
+  </action>
+  <action name="clearAction">
+   <property name="text">
+    <string>Очистить</string>
    </property>
   </action>
  </widget>

@@ -16,6 +16,7 @@ public:
 public slots:
     int addValue(const QString &value);
     int deleteValue(const QModelIndex &index);
+    void clearData();
 };
 
 #endif // DATAMODEL_H

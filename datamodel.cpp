@@ -37,3 +37,14 @@ int DataModel::deleteValue(const QModelIndex &index)
     emit layoutChanged();
     return pos;
 }
+
+/**
+ * @brief DataModel::clearData
+ */
+void DataModel::clearData()
+{
+    QStringList data = stringList();
+    data.clear();
+    setStringList(data);
+    emit layoutChanged();
+}

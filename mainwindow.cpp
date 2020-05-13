@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->delButton, &QPushButton::clicked, this, &MainWindow::deleteSong);
     connect(ui->sliderVolume, &QSlider::valueChanged, this, &MainWindow::volumeChange);
     connect(ui->openFilesAction, &QAction::triggered, this, &MainWindow::openFiles);
+    connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearPlaylist);
 
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
@@ -149,6 +150,13 @@ void MainWindow::openFiles()
 {
     QList<QUrl> list = QFileDialog::getOpenFileUrls(this, "Добавить mp3 файлы в плейлист", QUrl(), "*.mp3");
     addMediaToModel(list);
+}
+
+void MainWindow::clearPlaylist()
+{
+    dataModel->clearData();
+    playlist->clear();
+    clearMetaInfo();
 }
 
 void MainWindow::calculationTime(QTime* time, qint64 millsec)
