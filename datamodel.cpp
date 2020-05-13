@@ -5,11 +5,6 @@ DataModel::DataModel(QObject* parent) : QStringListModel(parent)
 
 }
 
-QStringList DataModel::print()
-{
-    return stringList();
-}
-
 /**
  * @brief DataModel::addValue
  * @param value Добавляемое значение
@@ -19,7 +14,7 @@ int DataModel::addValue(const QString &value)
 {
     QStringList data = stringList();
     int index = data.indexOf(value);
-    if (index == -1)
+    if (data.indexOf(value) == -1)
     {
         data.append(value);
         setStringList(data);
@@ -28,17 +23,17 @@ int DataModel::addValue(const QString &value)
     return index;
 }
 
+/**
+ * @brief DataModel::deleteValue
+ * @param value Удаляемое значение
+ */
 void DataModel::deleteValue(const QString &value)
 {
     QStringList data = stringList();
-    if (!data.isEmpty())
+    if (data.indexOf(value) != -1)
     {
-        int index = data.indexOf(value);
-        if (index != -1)
-        {
-            data.removeAt(data.indexOf(value));
-            setStringList(data);
-            emit layoutChanged();
-        }
+        data.removeAt(data.indexOf(value));
+        setStringList(data);
+        emit layoutChanged();
     }
 }

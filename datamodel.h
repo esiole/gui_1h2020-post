@@ -10,11 +10,8 @@ class DataModel : public QStringListModel
 {
     Q_OBJECT
 
-private:
-
 public:
     DataModel(QObject* parent);
-    QStringList print();
 
 public slots:
     int addValue(const QString &value);
