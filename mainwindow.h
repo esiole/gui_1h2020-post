@@ -12,6 +12,7 @@
 #include <QMediaPlaylist>
 #include <QMediaMetaData>
 #include <QTime>
+#include <QFileDialog>
 #include <QDebug>
 #include <QMessageBox>
 
@@ -40,6 +41,7 @@ public slots:
     void moveSlider();
     void deleteSong();
     void volumeChange(int volume);
+    void openFiles();
 
 private:
     Ui::MainWindow *ui;
@@ -51,5 +53,6 @@ private:
 
     void calculationTime(QTime* time, qint64 millsec);
     void clearMetaInfo();
+    void addMediaToModel(const QList<QUrl> &list);
 };
 #endif // MAINWINDOW_H

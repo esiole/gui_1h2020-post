@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->sliderDuration, &QSlider::sliderReleased, this, &MainWindow::moveSlider);
     connect(ui->delButton, &QPushButton::clicked, this, &MainWindow::deleteSong);
     connect(ui->sliderVolume, &QSlider::valueChanged, this, &MainWindow::volumeChange);
+    connect(ui->openFilesAction, &QAction::triggered, this, &MainWindow::openFiles);
 
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
@@ -57,22 +58,7 @@ void MainWindow::dropEvent(QDropEvent *event)
     const QMimeData* mimeData = event->mimeData();
     if (mimeData->hasUrls())
     {
-        QList<QUrl> urlList = mimeData->urls();
-        for (int i = 0; i < urlList.size(); i++)
-        {
-            QString path = urlList.at(i).toLocalFile();
-            QFileInfo* info = new QFileInfo(path);
-            QString suffix = QFileInfo(path).suffix();
-
-            if (suffix == "mp3")
-            {
-                int index = dataModel->addValue(info->baseName());
-                if (index == -1)
-                {
-                    playlist->addMedia(urlList.at(i));
-                }
-            }
-        }
+        addMediaToModel(mimeData->urls());
     }
 }
 
@@ -159,6 +145,12 @@ void MainWindow::volumeChange(int volume)
     ui->labelVolume->setText(QString::number(volume) + "%");
 }
 
+void MainWindow::openFiles()
+{
+    QList<QUrl> list = QFileDialog::getOpenFileUrls(this, "Добавить mp3 файлы в плейлист", QUrl(), "*.mp3");
+    addMediaToModel(list);
+}
+
 void MainWindow::calculationTime(QTime* time, qint64 millsec)
 {
     int seconds = static_cast<int>(millsec / 1000);
@@ -176,4 +168,23 @@ void MainWindow::clearMetaInfo()
     ui->labelMaxDuration->setText("");
     ui->labelCurrentDuration->setText("");
     ui->sliderDuration->setValue(0);
+}
+
+void MainWindow::addMediaToModel(const QList<QUrl> &list)
+{
+    for (int i = 0; i < list.size(); i++)
+    {
+        QString path = list.at(i).toLocalFile();
+        QFileInfo* info = new QFileInfo(path);
+        QString suffix = QFileInfo(path).suffix();
+
+        if (suffix == "mp3")
+        {
+            int index = dataModel->addValue(info->baseName());
+            if (index == -1)
+            {
+                playlist->addMedia(list.at(i));
+            }
+        }
+    }
 }
