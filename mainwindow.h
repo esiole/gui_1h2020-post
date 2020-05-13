@@ -11,6 +11,7 @@
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
 #include <QMediaMetaData>
+#include <QTime>
 #include <QDebug>
 #include <QMessageBox>
 
@@ -42,5 +43,9 @@ private:
     DataModel* dataModel;
     QMediaPlayer* player;
     QMediaPlaylist* playlist;
+    QTime* maxMediaDuration;
+    QTime* currentMediaDuration;
+
+    void calculationTime(QTime* time, qint64 millsec);
 };
 #endif // MAINWINDOW_H

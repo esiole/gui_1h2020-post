@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     setAcceptDrops(true);
 
+    maxMediaDuration = new QTime(0, 0);
+    currentMediaDuration = new QTime(0, 0);
     dataModel = new DataModel(this);
 
     ui->listView->setModel(dataModel);
@@ -77,10 +79,43 @@ void MainWindow::setMetaInfo()
     ui->labelTitle->setText(player->metaData(QMediaMetaData::Title).toString());
     ui->labelAlbum->setText(player->metaData(QMediaMetaData::AlbumTitle).toString());
     ui->labelYear->setText(player->metaData(QMediaMetaData::Year).toString());
-    ui->labelMaxDuration->setText(player->metaData(QMediaMetaData::Duration).toString());
+    calculationTime(maxMediaDuration, player->metaData(QMediaMetaData::Duration).toLongLong());
+    QString time = QString::number(maxMediaDuration->minute()) + ":" + QString::number(maxMediaDuration->second());
+    ui->labelMaxDuration->setText(time);
 }
 
 void MainWindow::durationChange(qint64 duration)
 {
-    ui->labelCurrentDuration->setText(QString::number(duration));
+    calculationTime(currentMediaDuration, duration);
+    QString time = "";
+    int second = currentMediaDuration->second();
+    int minute = currentMediaDuration->minute();
+    if (second < 10)
+    {
+        if (second == 0)
+        {
+            time = QString::number(currentMediaDuration->minute()) + ":00";
+        }
+        time = QString::number(minute) + ":0" + QString::number(second);
+    }
+    else
+    {
+        time = QString::number(minute) + ":" + QString::number(second);
+    }
+    ui->labelCurrentDuration->setText(time);
+    int current = currentMediaDuration->msecsSinceStartOfDay();
+    int max = maxMediaDuration->msecsSinceStartOfDay();
+    if (max != 0)
+    {
+        int value = static_cast<int>(current / static_cast<double>(max) * 100);
+        ui->sliderDuration->setValue(value);
+    }
+}
+
+void MainWindow::calculationTime(QTime* time, qint64 millsec)
+{
+    int seconds = static_cast<int>(millsec / 1000);
+    int minutes = seconds / 60;
+    seconds = seconds % 60;
+    time->setHMS(0, minutes, seconds, millsec % 1000);
 }
