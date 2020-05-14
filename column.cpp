@@ -5,15 +5,20 @@ Column::Column(int bottom, int width) : QGraphicsObject()
     this->bottom = bottom;
     this->width = width;
     height = 0;
-    deltaTimer = 300;
+    deltaTimer = 200;
     timer = new QTimer();
     connect(timer, &QTimer::timeout, this, &Column::timerRedraw);
+    upperTimer = new QTimer();
+    connect(upperTimer, &QTimer::timeout, this, &Column::upHeight);
 }
 
 void Column::timerRedraw()
 {
-    height = getRandomHeight();
-    update(0, 0, width, bottom);
+    upperTimer->stop();
+    int newHeight = getRandomHeight();
+    int deltaHeight = newHeight - height;
+    deltaUp = deltaHeight / static_cast<float>(deltaTimer) * 10;
+    upperTimer->start(10);
 }
 
 void Column::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
@@ -42,10 +47,17 @@ void Column::enableAnimation()
 void Column::disableAnimation()
 {
     timer->stop();
+    upperTimer->stop();
 }
 
 void Column::updateAnimation()
 {
     height = 0;
+    update(0, 0, width, bottom);
+}
+
+void Column::upHeight()
+{
+    height += static_cast<int>(deltaUp);
     update(0, 0, width, bottom);
 }

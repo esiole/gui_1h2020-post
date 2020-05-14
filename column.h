@@ -14,10 +14,13 @@ public:
     Column(int maxHeight, int width);
 
 public slots:
-    void timerRedraw();
     void enableAnimation();
     void disableAnimation();
     void updateAnimation();
+
+private slots:
+    void timerRedraw();
+    void upHeight();
 
 private:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
@@ -29,6 +32,8 @@ private:
     int height;
     int deltaTimer;
     QTimer* timer;
+    QTimer* upperTimer;
+    float deltaUp;
 };
 
 #endif // COLUMN_H
