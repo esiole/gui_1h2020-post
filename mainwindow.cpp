@@ -9,13 +9,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     setAcceptDrops(true);
 
-    maxMediaDuration = new QTime(0, 0);
-    currentMediaDuration = new QTime(0, 0);
-    dataModel = new DataModel(this);
-
-    ui->listView->setModel(dataModel);
-    ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
     int volume = 100;
     ui->sliderDuration->setValue(0);
     ui->labelVolume->setText(QString::number(volume) + "%");
@@ -28,8 +21,32 @@ MainWindow::MainWindow(QWidget *parent)
     player->setVolume(volume);
     playlist->setPlaybackMode(QMediaPlaylist::Loop);
 
-    connect(ui->listView, &QListView::doubleClicked, this, &MainWindow::doubleClickOnModelElement);
+    maxMediaDuration = new QTime(0, 0);
+    currentMediaDuration = new QTime(0, 0);
+    dataModel = new DataModel(this);
+    scene = new QGraphicsScene();
+    ui->graphicsView->setScene(scene);
+    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    int width = ui->graphicsView->width();
+    int height = ui->graphicsView->height();
+    int columnCount = 8;
+    int columnWidth = (width - 45) / columnCount;
+    scene->setSceneRect(0, 0, width, height);
+    for (int i = 0, x = 5; i < columnCount; i++, x += columnWidth + 5)
+    {
+        Column* column = new Column(100, columnWidth);
+        column->setPos(x, 0);
+        connect(this, &MainWindow::startColumn, column, &Column::enableAnimation);
+        connect(this, &MainWindow::stopColumn, column, &Column::disableAnimation);
+        connect(player, &QMediaPlayer::currentMediaChanged, column, &Column::updateAnimation);
+        scene->addItem(column);
+    }
 
+    ui->listView->setModel(dataModel);
+    ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    connect(ui->listView, &QListView::doubleClicked, this, &MainWindow::doubleClickOnModelElement);
     connect(ui->playButton, &QPushButton::clicked, player, &QMediaPlayer::play);
     connect(ui->nextButton, &QPushButton::clicked, playlist, &QMediaPlaylist::next);
     connect(ui->prevButton, &QPushButton::clicked, playlist, &QMediaPlaylist::previous);
@@ -39,9 +56,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->sliderVolume, &QSlider::valueChanged, this, &MainWindow::volumeChange);
     connect(ui->openFilesAction, &QAction::triggered, this, &MainWindow::openFiles);
     connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearPlaylist);
-
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
+    connect(player, &QMediaPlayer::stateChanged, this, &MainWindow::playerStateChange);
 }
 
 MainWindow::~MainWindow()
@@ -120,9 +137,11 @@ void MainWindow::deleteSong()
     QModelIndex index  = ui->listView->currentIndex();
     int pos = dataModel->deleteValue(index);
 
-    // при удалении первого элемента в плейлисте
-    // воспроизведение останавливается;
-    // чтобы вернуться к игравшей до этого песне
+    /**
+     * при удалении первого элемента в плейлисте
+     * воспроизведение останавливается;
+     * чтобы вернуться к игравшей до этого песне
+     */
     if (pos == 0)
     {
         int currentSong = playlist->currentIndex();
@@ -157,6 +176,18 @@ void MainWindow::clearPlaylist()
     dataModel->clearData();
     playlist->clear();
     clearMetaInfo();
+}
+
+void MainWindow::playerStateChange(QMediaPlayer::State state)
+{
+    if (state == QMediaPlayer::State::PlayingState)
+    {
+        emit startColumn();
+    }
+    if (state == QMediaPlayer::State::PausedState)
+    {
+        emit stopColumn();
+    }
 }
 
 void MainWindow::calculationTime(QTime* time, qint64 millsec)

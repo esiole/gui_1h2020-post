@@ -13,11 +13,11 @@
 #include <QMediaMetaData>
 #include <QTime>
 #include <QFileDialog>
+#include <QGraphicsScene>
 #include <QDebug>
-#include <QMessageBox>
 
 #include "datamodel.h"
-#include "windows.h"
+#include "column.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,7 +29,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
     virtual void dragEnterEvent(QDragEnterEvent* event) override;
     virtual void dropEvent(QDropEvent *event) override;
@@ -43,6 +43,11 @@ public slots:
     void volumeChange(int volume);
     void openFiles();
     void clearPlaylist();
+    void playerStateChange(QMediaPlayer::State state);
+
+signals:
+    void stopColumn();
+    void startColumn();
 
 private:
     Ui::MainWindow *ui;
@@ -51,6 +56,7 @@ private:
     QMediaPlaylist* playlist;
     QTime* maxMediaDuration;
     QTime* currentMediaDuration;
+    QGraphicsScene* scene;
 
     void calculationTime(QTime* time, qint64 millsec);
     void clearMetaInfo();
