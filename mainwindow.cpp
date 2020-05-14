@@ -12,6 +12,21 @@ MainWindow::MainWindow(QWidget *parent)
     maxMediaDuration = new QTime(0, 0);
     currentMediaDuration = new QTime(0, 0);
     dataModel = new DataModel(this);
+    scene = new QGraphicsScene();
+    ui->graphicsView->setScene(scene);
+    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    int width = ui->graphicsView->width();
+    int height = ui->graphicsView->height();
+    int columnCount = 8;
+    int columnWidth = (width - 45) / columnCount;
+    scene->setSceneRect(0, 0, width, height);
+    for (int i = 0, x = 5; i < columnCount; i++, x += columnWidth + 5)
+    {
+        Column* column = new Column(100, columnWidth);
+        column->setPos(x, 0);
+        scene->addItem(column);
+    }
 
     ui->listView->setModel(dataModel);
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -120,9 +135,11 @@ void MainWindow::deleteSong()
     QModelIndex index  = ui->listView->currentIndex();
     int pos = dataModel->deleteValue(index);
 
-    // при удалении первого элемента в плейлисте
-    // воспроизведение останавливается;
-    // чтобы вернуться к игравшей до этого песне
+    /**
+     * при удалении первого элемента в плейлисте
+     * воспроизведение останавливается;
+     * чтобы вернуться к игравшей до этого песне
+     */
     if (pos == 0)
     {
         int currentSong = playlist->currentIndex();
