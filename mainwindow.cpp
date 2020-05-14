@@ -9,6 +9,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     setAcceptDrops(true);
 
+    int volume = 100;
+    ui->sliderDuration->setValue(0);
+    ui->labelVolume->setText(QString::number(volume) + "%");
+    ui->sliderVolume->setValue(volume);
+    ui->sliderVolume->setTickPosition(QSlider::TickPosition::TicksRight);
+
+    player = new QMediaPlayer(this);
+    playlist = new QMediaPlaylist(this);
+    player->setPlaylist(playlist);
+    player->setVolume(volume);
+    playlist->setPlaybackMode(QMediaPlaylist::Loop);
+
     maxMediaDuration = new QTime(0, 0);
     currentMediaDuration = new QTime(0, 0);
     dataModel = new DataModel(this);
@@ -25,26 +37,16 @@ MainWindow::MainWindow(QWidget *parent)
     {
         Column* column = new Column(100, columnWidth);
         column->setPos(x, 0);
+        connect(this, &MainWindow::startColumn, column, &Column::enableAnimation);
+        connect(this, &MainWindow::stopColumn, column, &Column::disableAnimation);
+        connect(player, &QMediaPlayer::currentMediaChanged, column, &Column::updateAnimation);
         scene->addItem(column);
     }
 
     ui->listView->setModel(dataModel);
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    int volume = 100;
-    ui->sliderDuration->setValue(0);
-    ui->labelVolume->setText(QString::number(volume) + "%");
-    ui->sliderVolume->setValue(volume);
-    ui->sliderVolume->setTickPosition(QSlider::TickPosition::TicksRight);
-
-    player = new QMediaPlayer(this);
-    playlist = new QMediaPlaylist(this);
-    player->setPlaylist(playlist);
-    player->setVolume(volume);
-    playlist->setPlaybackMode(QMediaPlaylist::Loop);
-
     connect(ui->listView, &QListView::doubleClicked, this, &MainWindow::doubleClickOnModelElement);
-
     connect(ui->playButton, &QPushButton::clicked, player, &QMediaPlayer::play);
     connect(ui->nextButton, &QPushButton::clicked, playlist, &QMediaPlaylist::next);
     connect(ui->prevButton, &QPushButton::clicked, playlist, &QMediaPlaylist::previous);
@@ -54,9 +56,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->sliderVolume, &QSlider::valueChanged, this, &MainWindow::volumeChange);
     connect(ui->openFilesAction, &QAction::triggered, this, &MainWindow::openFiles);
     connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearPlaylist);
-
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
+    connect(player, &QMediaPlayer::stateChanged, this, &MainWindow::playerStateChange);
 }
 
 MainWindow::~MainWindow()
@@ -174,6 +176,18 @@ void MainWindow::clearPlaylist()
     dataModel->clearData();
     playlist->clear();
     clearMetaInfo();
+}
+
+void MainWindow::playerStateChange(QMediaPlayer::State state)
+{
+    if (state == QMediaPlayer::State::PlayingState)
+    {
+        emit startColumn();
+    }
+    if (state == QMediaPlayer::State::PausedState)
+    {
+        emit stopColumn();
+    }
 }
 
 void MainWindow::calculationTime(QTime* time, qint64 millsec)

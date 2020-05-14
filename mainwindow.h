@@ -43,6 +43,11 @@ public slots:
     void volumeChange(int volume);
     void openFiles();
     void clearPlaylist();
+    void playerStateChange(QMediaPlayer::State state);
+
+signals:
+    void stopColumn();
+    void startColumn();
 
 private:
     Ui::MainWindow *ui;

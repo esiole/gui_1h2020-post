@@ -4,10 +4,10 @@ Column::Column(int bottom, int width) : QGraphicsObject()
 {
     this->bottom = bottom;
     this->width = width;
-    height = bottom / 2;
+    height = 0;
+    deltaTimer = 300;
     timer = new QTimer();
     connect(timer, &QTimer::timeout, this, &Column::timerRedraw);
-    timer->start(300);
 }
 
 void Column::timerRedraw()
@@ -32,4 +32,20 @@ QRectF Column::boundingRect() const
 int Column::getRandomHeight() const
 {
     return qrand() % (bottom + 1);
+}
+
+void Column::enableAnimation()
+{
+    timer->start(deltaTimer);
+}
+
+void Column::disableAnimation()
+{
+    timer->stop();
+}
+
+void Column::updateAnimation()
+{
+    height = 0;
+    update(0, 0, width, bottom);
 }

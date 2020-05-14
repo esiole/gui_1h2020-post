@@ -15,6 +15,9 @@ public:
 
 public slots:
     void timerRedraw();
+    void enableAnimation();
+    void disableAnimation();
+    void updateAnimation();
 
 private:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
@@ -24,6 +27,7 @@ private:
     int bottom;
     int width;
     int height;
+    int deltaTimer;
     QTimer* timer;
 };
 
