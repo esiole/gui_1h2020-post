@@ -12,6 +12,7 @@ class Column : public QGraphicsObject
 
 public:
     Column(int maxHeight, int width);
+    ~Column() override;
 
 public slots:
     void enableAnimation();
@@ -23,17 +24,17 @@ private slots:
     void upHeight();
 
 private:
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
-    QRectF boundingRect() const;
-    int getRandomHeight() const;
+    int bottom;         // максимально возможная высота столбика (уровень дна)
+    int width;          // ширина столбика
+    int height;         // текущая высота столбика
+    int deltaTimer;     // время в мс для таймера генерации высоты нового уровня
+    float deltaUp;      // расстояние для движения на один тик для плавной анимации
+    QTimer* timer;      // таймер для генерации высоты нового уровня
+    QTimer* upperTimer; // таймер для плавной анимации движения
 
-    int bottom;
-    int width;
-    int height;
-    int deltaTimer;
-    QTimer* timer;
-    QTimer* upperTimer;
-    float deltaUp;
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+    QRectF boundingRect() const override;
+    int getRandomHeight() const;
 };
 
 #endif // COLUMN_H
