@@ -52,10 +52,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->prevButton, &QPushButton::clicked, playlist, &QMediaPlaylist::previous);
     connect(ui->pauseButton, &QPushButton::clicked, player, &QMediaPlayer::pause);
     connect(ui->sliderDuration, &QSlider::sliderReleased, this, &MainWindow::moveSlider);
-    connect(ui->delButton, &QPushButton::clicked, this, &MainWindow::deleteSong);
     connect(ui->sliderVolume, &QSlider::valueChanged, this, &MainWindow::volumeChange);
     connect(ui->openFilesAction, &QAction::triggered, this, &MainWindow::openFiles);
     connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearPlaylist);
+    connect(ui->delAction, &QAction::triggered, this, &MainWindow::deleteSong);
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
     connect(player, &QMediaPlayer::stateChanged, this, &MainWindow::playerStateChange);
@@ -176,6 +176,7 @@ void MainWindow::clearPlaylist()
     dataModel->clearData();
     playlist->clear();
     clearMetaInfo();
+    emit stopColumn();
 }
 
 void MainWindow::playerStateChange(QMediaPlayer::State state)
