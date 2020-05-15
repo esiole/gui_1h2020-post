@@ -114,9 +114,12 @@ void MainWindow::durationChange(qint64 duration)
 
 void MainWindow::moveSlider()
 {
-    int value = ui->sliderDuration->sliderPosition();
-    int current = static_cast<int>(static_cast<double>(value) / 100 * maxMediaDuration->msecsSinceStartOfDay());
-    player->setPosition(current);
+    if (player->state() == QMediaPlayer::State::PlayingState)
+    {
+        int value = ui->sliderDuration->sliderPosition();
+        int current = static_cast<int>(static_cast<double>(value) / 100 * maxMediaDuration->msecsSinceStartOfDay());
+        player->setPosition(current);
+    }
 }
 
 void MainWindow::volumeChange(int volume)
@@ -162,6 +165,7 @@ void MainWindow::deleteSong()
     if (playlist->mediaCount() == 0)
     {
         clearMetaInfo();
+        emit stopColumn();
     }
     player->play();
 }
@@ -213,10 +217,9 @@ void MainWindow::addMediaToModel(const QList<QUrl> &list)
         QString path = list.at(i).toLocalFile();
         QFileInfo* info = new QFileInfo(path);
         QString suffix = QFileInfo(path).suffix();
-
         if (suffix == "mp3")
         {
-            int index = dataModel->addValue(info->baseName());
+            int index = dataModel->addValue(info->completeBaseName());
             if (index == -1)
             {
                 playlist->addMedia(list.at(i));
