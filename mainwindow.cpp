@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     maxMediaDuration = new QTime(0, 0);
     currentMediaDuration = new QTime(0, 0);
 
-    int volume = 100;
+    const int volume = 100;
     ui->sliderDuration->setValue(0);
     ui->labelVolume->setText(QString::number(volume) + "%");
     ui->sliderVolume->setValue(volume);
@@ -31,10 +31,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    int width = ui->graphicsView->width();
-    int height = ui->graphicsView->height();
-    int columnCount = 10;
-    int columnWidth = (width - 5 * (columnCount + 1)) / columnCount;
+    const int width = ui->graphicsView->width();
+    const int height = ui->graphicsView->height();
+    const int columnCount = 10;
+    const int columnWidth = (width - 5 * (columnCount + 1)) / columnCount;
     scene->setSceneRect(0, 0, width, height);
     for (int i = 0, x = 5; i < columnCount; i++, x += columnWidth + 5)
     {
@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
         scene->addItem(column);
     }
 
-    connect(ui->tableView, &QListView::doubleClicked, this, &MainWindow::doubleClickOnModelElement);
+    connect(ui->tableView, &QTableView::doubleClicked, this, &MainWindow::doubleClickOnModelElement);
     connect(ui->playButton, &QPushButton::clicked, player, &QMediaPlayer::play);
     connect(ui->nextButton, &QPushButton::clicked, dataModel, &DataModel::next);
     connect(ui->prevButton, &QPushButton::clicked, dataModel, &DataModel::previous);
@@ -97,42 +97,59 @@ void MainWindow::doubleClickOnModelElement(const QModelIndex& index)
     player->play();
 }
 
+/**
+ * @brief MainWindow::durationChange выводит прошедшее время с начала воспроизведения mediа, двигает slider
+ * @param duration количество миллисекунд
+ */
 void MainWindow::durationChange(qint64 duration)
 {
     calculationTime(currentMediaDuration, duration);
-    QString time = getStringFromTime(currentMediaDuration->minute(), currentMediaDuration->second());
+    const QString time = getStringFromTime(currentMediaDuration->minute(), currentMediaDuration->second());
     ui->labelCurrentDuration->setText(time);
-    int current = currentMediaDuration->msecsSinceStartOfDay();
-    int max = maxMediaDuration->msecsSinceStartOfDay();
+    const int current = currentMediaDuration->msecsSinceStartOfDay();
+    const int max = maxMediaDuration->msecsSinceStartOfDay();
     if (max != 0)
     {
-        int value = static_cast<int>(current / static_cast<double>(max) * 100);
+        const int value = static_cast<int>(current / static_cast<double>(max) * 100);
         ui->sliderDuration->setValue(value);
     }
 }
 
+/**
+ * @brief MainWindow::moveSlider пересчёт текущей позиции в медиа, исходя из положения слайдера
+ */
 void MainWindow::moveSlider()
 {
     if (player->state() == QMediaPlayer::State::PlayingState)
     {
-        int value = ui->sliderDuration->sliderPosition();
-        int current = static_cast<int>(static_cast<double>(value) / 100 * maxMediaDuration->msecsSinceStartOfDay());
+        const int value = ui->sliderDuration->sliderPosition();
+        const int current = static_cast<int>(static_cast<double>(value) / 100 * maxMediaDuration->msecsSinceStartOfDay());
         player->setPosition(current);
     }
 }
 
+/**
+ * @brief MainWindow::volumeChange изменяет уровень громкости и отображает его на виджете
+ * @param volume значение громкости
+ */
 void MainWindow::volumeChange(int volume)
 {
     player->setVolume(volume);
     ui->labelVolume->setText(QString::number(volume) + "%");
 }
 
+/**
+ * @brief MainWindow::openFiles открытие окна с выбором mp3 файлов
+ */
 void MainWindow::openFiles()
 {
-    QList<QUrl> list = QFileDialog::getOpenFileUrls(this, "Добавить mp3 файлы в плейлист", QUrl(), "*.mp3");
+    const QList<QUrl> list = QFileDialog::getOpenFileUrls(this, "Добавить mp3 файлы в плейлист", QUrl(), "*.mp3");
     addMediaToModel(list);
 }
 
+/**
+ * @brief MainWindow::clearPlaylist удаляет все media
+ */
 void MainWindow::clearPlaylist()
 {
     dataModel->clearData();
@@ -140,10 +157,12 @@ void MainWindow::clearPlaylist()
     emit stopColumn();
 }
 
+/**
+ * @brief MainWindow::deleteSong удаляет выделенную media
+ */
 void MainWindow::deleteSong()
 {
-    QModelIndex index  = ui->tableView->currentIndex();
-    int mediaCount = dataModel->deleteValue(index);
+    const int mediaCount = dataModel->deleteValue(ui->tableView->currentIndex());
     if (mediaCount == 0)
     {
         clearMetaInfo();
@@ -152,18 +171,25 @@ void MainWindow::deleteSong()
     player->play();
 }
 
+/**
+ * @brief MainWindow::setMetaInfo установка мета информации о текущей media
+ */
 void MainWindow::setMetaInfo()
 {
-    QString author = player->metaData(QMediaMetaData::Author).toString();
-    QString title = player->metaData(QMediaMetaData::Title).toString();
-    QString album = player->metaData(QMediaMetaData::AlbumTitle).toString();
-    QString year = player->metaData(QMediaMetaData::Year).toString();
+    const QString author = player->metaData(QMediaMetaData::Author).toString();
+    const QString title = player->metaData(QMediaMetaData::Title).toString();
+    const QString album = player->metaData(QMediaMetaData::AlbumTitle).toString();
+    const QString year = player->metaData(QMediaMetaData::Year).toString();
     emit setMeta(author, title, album, year);
     calculationTime(maxMediaDuration, player->metaData(QMediaMetaData::Duration).toLongLong());
     ui->labelMaxDuration->setText(getStringFromTime(maxMediaDuration->minute(), maxMediaDuration->second()));
     ui->labelFileName->setText(dataModel->getNameCurrentMedia());
 }
 
+/**
+ * @brief MainWindow::playerStateChange остановка/запуск анимации столбиков
+ * @param state состояние player
+ */
 void MainWindow::playerStateChange(QMediaPlayer::State state)
 {
     if (state == QMediaPlayer::State::PlayingState)
@@ -176,14 +202,22 @@ void MainWindow::playerStateChange(QMediaPlayer::State state)
     }
 }
 
+/**
+ * @brief MainWindow::calculationTime расчёт времени исходя из количества миллисекунд
+ * @param time в него устанавливается результат
+ * @param millsec количество миллисекунд
+ */
 void MainWindow::calculationTime(QTime* time, qint64 millsec)
 {
     int seconds = static_cast<int>(millsec / 1000);
-    int minutes = seconds / 60;
+    const int minutes = seconds / 60;
     seconds = seconds % 60;
     time->setHMS(0, minutes, seconds, millsec % 1000);
 }
 
+/**
+ * @brief MainWindow::clearMetaInfo очистка мета информации о текущей media
+ */
 void MainWindow::clearMetaInfo()
 {
     emit clearMeta();
@@ -192,18 +226,27 @@ void MainWindow::clearMetaInfo()
     ui->sliderDuration->setValue(0);
 }
 
+/**
+ * @brief MainWindow::addMediaToModel добавляет media в модель данных
+ * @param list список url media
+ */
 void MainWindow::addMediaToModel(const QList<QUrl> &list)
 {
-    for (int i = 0; i < list.size(); i++)
+    foreach (QUrl elem, list)
     {
-        QString path = list.at(i).toLocalFile();
-        if (QFileInfo(path).suffix() == "mp3")
+        if (QFileInfo(elem.toLocalFile()).suffix() == "mp3")
         {
-            dataModel->addValue(list.at(i));
+            dataModel->addValue(elem);
         }
     }
 }
 
+/**
+ * @brief MainWindow::getStringFromTime формирует строку времени в шаблоне "XX:XX"
+ * @param minutes количество минут
+ * @param seconds количество секунд
+ * @return строка времени, если количество минут < 10, то первая цифра опускается
+ */
 QString MainWindow::getStringFromTime(int minutes, int seconds) const
 {
     QString time = "";

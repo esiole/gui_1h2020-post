@@ -4,17 +4,9 @@
 #include <QMainWindow>
 #include <QDropEvent>
 #include <QMimeData>
-#include <QList>
-#include <QUrl>
-#include <QFileInfo>
-#include <QListView>
-#include <QMediaPlayer>
-#include <QMediaPlaylist>
 #include <QMediaMetaData>
 #include <QTime>
 #include <QFileDialog>
-#include <QGraphicsScene>
-#include <QDebug>
 
 #include "datamodel.h"
 #include "column.h"

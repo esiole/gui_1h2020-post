@@ -5,12 +5,9 @@
  * @param bottom уровень дна столбика (максимальная высота)
  * @param width ширина столбика
  */
-Column::Column(int bottom, int width) : QGraphicsObject()
+Column::Column(int bottom, int width) : QGraphicsObject(), bottom(bottom), width(width), deltaTimer(200)
 {
-    this->bottom = bottom;
-    this->width = width;
     height = 0;
-    deltaTimer = 200;
     timer = new QTimer(this);
     upperTimer = new QTimer(this);
 
