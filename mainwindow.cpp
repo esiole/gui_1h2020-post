@@ -95,6 +95,7 @@ void MainWindow::setMetaInfo()
     calculationTime(maxMediaDuration, player->metaData(QMediaMetaData::Duration).toLongLong());
     QString time = QString::number(maxMediaDuration->minute()) + ":" + QString::number(maxMediaDuration->second());
     ui->labelMaxDuration->setText(time);
+    ui->labelFileName->setText(dataModel->getValue(playlist->currentIndex()));
 }
 
 void MainWindow::durationChange(qint64 duration)

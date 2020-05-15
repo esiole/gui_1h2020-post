@@ -324,6 +324,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QLabel" name="labelFileName">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>190</y>
+      <width>281</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -362,6 +375,9 @@
    </property>
   </action>
   <action name="delAction">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Удалить песню</string>
    </property>
