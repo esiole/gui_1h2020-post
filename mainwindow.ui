@@ -266,9 +266,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>140</y>
+      <y>130</y>
       <width>321</width>
-      <height>20</height>
+      <height>60</height>
      </rect>
     </property>
     <property name="font">
@@ -284,6 +284,9 @@
     <property name="alignment">
      <set>Qt::AlignCenter</set>
     </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QTableView" name="tableView">
     <property name="geometry">
@@ -293,6 +296,11 @@
       <width>321</width>
       <height>381</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
     </property>
    </widget>
   </widget>
