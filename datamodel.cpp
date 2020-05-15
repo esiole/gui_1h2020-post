@@ -48,3 +48,14 @@ void DataModel::clearData()
     setStringList(data);
     emit layoutChanged();
 }
+
+QString DataModel::getValue(int row)
+{
+    QStringList data = stringList();
+    QString value = "";
+    if (row >= 0 && row < data.size())
+    {
+        value = data.at(row);
+    }
+    return value;
+}

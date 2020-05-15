@@ -18,6 +18,7 @@
 
 #include "datamodel.h"
 #include "column.h"
+#include "metasonginfo.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,7 +37,7 @@ public:
 
 public slots:
     void doubleClickOnModelElement(const QModelIndex& index);
-    void setMetaInfo();
+    //void setMetaInfo();
     void durationChange(qint64 duration);
     void moveSlider();
     void deleteSong();
@@ -44,10 +45,13 @@ public slots:
     void openFiles();
     void clearPlaylist();
     void playerStateChange(QMediaPlayer::State state);
+    void setMetaInfo();
 
 signals:
     void stopColumn();
     void startColumn();
+    void setMeta(const QString &author, const QString &title, const QString &album, const QString &year);
+    void clearMeta();
 
 private:
     Ui::MainWindow *ui;
@@ -57,6 +61,7 @@ private:
     QTime* maxMediaDuration;
     QTime* currentMediaDuration;
     QGraphicsScene* scene;
+    MetaSongInfo* info;
 
     void calculationTime(QTime* time, qint64 millsec);
     void clearMetaInfo();
