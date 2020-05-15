@@ -21,15 +21,18 @@ SOURCES += \
     column.cpp \
     datamodel.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    metasonginfo.cpp
 
 HEADERS += \
     column.h \
     datamodel.h \
-    mainwindow.h
+    mainwindow.h \
+    metasonginfo.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    metasonginfo.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setAcceptDrops(true);
 
+    info = new MetaSongInfo();
     int volume = 100;
     ui->sliderDuration->setValue(0);
     ui->labelVolume->setText(QString::number(volume) + "%");
@@ -30,8 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     int width = ui->graphicsView->width();
     int height = ui->graphicsView->height();
-    int columnCount = 8;
-    int columnWidth = (width - 45) / columnCount;
+    int columnCount = 10;
+    int columnWidth = (width - 5 * (columnCount + 1)) / columnCount;
     scene->setSceneRect(0, 0, width, height);
     for (int i = 0, x = 5; i < columnCount; i++, x += columnWidth + 5)
     {
@@ -56,7 +57,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->openFilesAction, &QAction::triggered, this, &MainWindow::openFiles);
     connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearPlaylist);
     connect(ui->delAction, &QAction::triggered, this, &MainWindow::deleteSong);
+    connect(ui->metaAction, &QAction::triggered, info, &MetaSongInfo::show);
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
+    connect(this, &MainWindow::setMeta, info, &MetaSongInfo::setInfo);
+    connect(this, &MainWindow::clearMeta, info, &MetaSongInfo::clearInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
     connect(player, &QMediaPlayer::stateChanged, this, &MainWindow::playerStateChange);
 }
@@ -84,18 +88,6 @@ void MainWindow::doubleClickOnModelElement(const QModelIndex& index)
 {
     playlist->setCurrentIndex(index.row());
     player->play();
-}
-
-void MainWindow::setMetaInfo()
-{
-    ui->labelPlayer->setText(player->metaData(QMediaMetaData::Author).toString());
-    ui->labelTitle->setText(player->metaData(QMediaMetaData::Title).toString());
-    ui->labelAlbum->setText(player->metaData(QMediaMetaData::AlbumTitle).toString());
-    ui->labelYear->setText(player->metaData(QMediaMetaData::Year).toString());
-    calculationTime(maxMediaDuration, player->metaData(QMediaMetaData::Duration).toLongLong());
-    QString time = QString::number(maxMediaDuration->minute()) + ":" + QString::number(maxMediaDuration->second());
-    ui->labelMaxDuration->setText(time);
-    ui->labelFileName->setText(dataModel->getValue(playlist->currentIndex()));
 }
 
 void MainWindow::durationChange(qint64 duration)
@@ -192,6 +184,19 @@ void MainWindow::playerStateChange(QMediaPlayer::State state)
     }
 }
 
+void MainWindow::setMetaInfo()
+{
+    QString author = player->metaData(QMediaMetaData::Author).toString();
+    QString title = player->metaData(QMediaMetaData::Title).toString();
+    QString album = player->metaData(QMediaMetaData::AlbumTitle).toString();
+    QString year = player->metaData(QMediaMetaData::Year).toString();
+    emit setMeta(author, title, album, year);
+    calculationTime(maxMediaDuration, player->metaData(QMediaMetaData::Duration).toLongLong());
+    QString time = QString::number(maxMediaDuration->minute()) + ":" + QString::number(maxMediaDuration->second());
+    ui->labelMaxDuration->setText(time);
+    ui->labelFileName->setText(dataModel->getValue(playlist->currentIndex()));
+}
+
 void MainWindow::calculationTime(QTime* time, qint64 millsec)
 {
     int seconds = static_cast<int>(millsec / 1000);
@@ -202,10 +207,7 @@ void MainWindow::calculationTime(QTime* time, qint64 millsec)
 
 void MainWindow::clearMetaInfo()
 {
-    ui->labelPlayer->setText("");
-    ui->labelTitle->setText("");
-    ui->labelAlbum->setText("");
-    ui->labelYear->setText("");
+    emit clearMeta();
     ui->labelMaxDuration->setText("");
     ui->labelCurrentDuration->setText("");
     ui->sliderDuration->setValue(0);

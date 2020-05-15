@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>951</width>
-    <height>529</height>
+    <width>680</width>
+    <height>449</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
    <widget class="QListView" name="listView">
     <property name="geometry">
      <rect>
-      <x>640</x>
+      <x>370</x>
       <y>10</y>
       <width>301</width>
       <height>381</height>
@@ -32,7 +32,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>270</y>
+      <y>215</y>
       <width>50</width>
       <height>50</height>
      </rect>
@@ -58,7 +58,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>270</y>
+      <y>215</y>
       <width>50</width>
       <height>50</height>
      </rect>
@@ -87,7 +87,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>270</y>
+      <y>215</y>
       <width>50</width>
       <height>50</height>
      </rect>
@@ -113,7 +113,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>270</y>
+      <y>215</y>
       <width>50</width>
       <height>50</height>
      </rect>
@@ -135,63 +135,11 @@
      </size>
     </property>
    </widget>
-   <widget class="QLabel" name="labelPlayer">
-    <property name="geometry">
-     <rect>
-      <x>440</x>
-      <y>40</y>
-      <width>111</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Player</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelTitle">
-    <property name="geometry">
-     <rect>
-      <x>440</x>
-      <y>70</y>
-      <width>141</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Name</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelAlbum">
-    <property name="geometry">
-     <rect>
-      <x>440</x>
-      <y>110</y>
-      <width>151</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Album</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelYear">
-    <property name="geometry">
-     <rect>
-      <x>440</x>
-      <y>160</y>
-      <width>71</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Year</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="labelMaxDuration">
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>240</y>
+      <y>185</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -210,7 +158,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>240</y>
+      <y>185</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -237,7 +185,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>235</y>
+      <y>180</y>
       <width>231</width>
       <height>31</height>
      </rect>
@@ -328,13 +276,22 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>190</y>
+      <y>140</y>
       <width>281</width>
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string>File Name</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
   </widget>
@@ -343,7 +300,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>951</width>
+     <width>680</width>
      <height>26</height>
     </rect>
    </property>
@@ -357,6 +314,8 @@
     <property name="title">
      <string>Плейлист</string>
     </property>
+    <addaction name="metaAction"/>
+    <addaction name="separator"/>
     <addaction name="delAction"/>
     <addaction name="clearAction"/>
    </widget>
@@ -380,6 +339,11 @@
    </property>
    <property name="text">
     <string>Удалить песню</string>
+   </property>
+  </action>
+  <action name="metaAction">
+   <property name="text">
+    <string>Мета информация</string>
    </property>
   </action>
  </widget>
