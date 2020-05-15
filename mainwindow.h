@@ -56,7 +56,6 @@ private:
     Ui::MainWindow *ui;
     DataModel* dataModel;
     QMediaPlayer* player;
-    QMediaPlaylist* playlist;
     QTime* maxMediaDuration;
     QTime* currentMediaDuration;
     QGraphicsScene* scene;

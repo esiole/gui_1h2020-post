@@ -1,8 +1,72 @@
 #include "datamodel.h"
 
-DataModel::DataModel(QObject* parent) : QStringListModel(parent)
+DataModel::DataModel(QMediaPlayer* player, QObject* parent) : QAbstractListModel(parent)
 {
+    playlist = new QMediaPlaylist(this);
+    player->setPlaylist(playlist);
+    playlist->setPlaybackMode(QMediaPlaylist::Loop);
+}
 
+int DataModel::rowCount(const QModelIndex &) const
+{
+    return playlist->mediaCount();
+}
+
+QVariant DataModel::data(const QModelIndex &index, int role) const
+{
+    if(role == Qt::DisplayRole)
+    {
+        return getNameMedia(index.row());
+    }
+    return QVariant();
+}
+
+/**
+ * @brief DataModel::setCurrentMedia устанавливает текущее медиа в плейлисте
+ * @param index индекс устанавливаемой медиа
+ */
+void DataModel::setCurrentMedia(const QModelIndex &index)
+{
+    playlist->setCurrentIndex(index.row());
+}
+
+/**
+ * @brief DataModel::getNameCurrentMedia
+ * @return имя файла текущей медиа в плейлисте
+ */
+QString DataModel::getNameCurrentMedia() const
+{
+    return getNameMedia(playlist->currentIndex());
+}
+
+/**
+ * @brief DataModel::getNameMedia
+ * @param pos позиция медиа в playlist
+ * @return название файла медиа
+ */
+QString DataModel::getNameMedia(int pos) const
+{
+    QString path = playlist->media(pos).request().url().toLocalFile();
+    return QFileInfo(path).completeBaseName();
+}
+
+/**
+ * @brief DataModel::isExistMedia проверяет, находится ли медиа в playlist
+ * @param url адрес медиа
+ * @return true если присутствует, при отсутствии false
+ */
+bool DataModel::isExistMedia(const QUrl &url) const
+{
+    bool isExist = false;
+    for (int i = 0; i < playlist->mediaCount(); i++)
+    {
+        if (playlist->media(i) == url)
+        {
+            isExist = true;
+            break;
+        }
+    }
+    return isExist;
 }
 
 /**
@@ -10,32 +74,40 @@ DataModel::DataModel(QObject* parent) : QStringListModel(parent)
  * @param value добавляемое значение
  * @return -1, если такого элемента нет в модели, иначе какое-то число
  */
-int DataModel::addValue(const QString &value)
+void DataModel::addValue(const QUrl &path)
 {
-    QStringList data = stringList();
-    const int index = data.indexOf(value);
-    if (index == -1)
+    if (!isExistMedia(path))
     {
-        data.append(value);
-        setStringList(data);
+        playlist->addMedia(path);
         emit layoutChanged();
     }
-    return index;
 }
 
 /**
  * @brief DataModel::deleteValue удаляет элемент из модели
  * @param index индекс удаляемого элемента
- * @return позиция удаляемого элемента в списке
+ * @return количество оставшихся элементов в модели
  */
 int DataModel::deleteValue(const QModelIndex &index)
 {
-    QStringList data = stringList();
+    /**
+     * при удалении первого элемента в плейлисте
+     * воспроизведение останавливается;
+     * чтобы вернуться к игравшей до этого песне
+     */
     const int pos = index.row();
-    data.removeAt(pos);
-    setStringList(data);
+    if (pos == 0)
+    {
+        const int currentSong = playlist->currentIndex();
+        playlist->removeMedia(pos);
+        playlist->setCurrentIndex(currentSong - 1);
+    }
+    else
+    {
+        playlist->removeMedia(pos);
+    }
     emit layoutChanged();
-    return pos;
+    return playlist->mediaCount();
 }
 
 /**
@@ -43,24 +115,16 @@ int DataModel::deleteValue(const QModelIndex &index)
  */
 void DataModel::clearData()
 {
-    QStringList data = stringList();
-    data.clear();
-    setStringList(data);
+    playlist->clear();
     emit layoutChanged();
 }
 
-/**
- * @brief DataModel::getValue возвращает значение элемента из модели
- * @param row позиция элемента в модели
- * @return значение элемента
- */
-QString DataModel::getValue(int row) const
+void DataModel::next()
 {
-    const QStringList data = stringList();
-    QString value = "";
-    if (row >= 0 && row < data.size())
-    {
-        value = data.at(row);
-    }
-    return value;
+    playlist->next();
+}
+
+void DataModel::previous()
+{
+    playlist->previous();
 }
