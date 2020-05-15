@@ -32,8 +32,8 @@ private:
     QTimer* timer;      // таймер для генерации высоты нового уровня
     QTimer* upperTimer; // таймер для плавной анимации движения
 
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
-    QRectF boundingRect() const override;
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+    virtual QRectF boundingRect() const override;
     int getRandomHeight() const;
 };
 

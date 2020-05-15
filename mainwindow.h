@@ -31,21 +31,20 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
-
     virtual void dragEnterEvent(QDragEnterEvent* event) override;
-    virtual void dropEvent(QDropEvent *event) override;
+    virtual void dropEvent(QDropEvent* event) override;
+    virtual void closeEvent(QCloseEvent* event) override;
 
-public slots:
+private slots:
     void doubleClickOnModelElement(const QModelIndex& index);
-    //void setMetaInfo();
     void durationChange(qint64 duration);
     void moveSlider();
-    void deleteSong();
     void volumeChange(int volume);
     void openFiles();
     void clearPlaylist();
-    void playerStateChange(QMediaPlayer::State state);
+    void deleteSong();
     void setMetaInfo();
+    void playerStateChange(QMediaPlayer::State state);
 
 signals:
     void stopColumn();

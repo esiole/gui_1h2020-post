@@ -13,7 +13,7 @@ DataModel::DataModel(QObject* parent) : QStringListModel(parent)
 int DataModel::addValue(const QString &value)
 {
     QStringList data = stringList();
-    int index = data.indexOf(value);
+    const int index = data.indexOf(value);
     if (index == -1)
     {
         data.append(value);
@@ -31,7 +31,7 @@ int DataModel::addValue(const QString &value)
 int DataModel::deleteValue(const QModelIndex &index)
 {
     QStringList data = stringList();
-    int pos = index.row();
+    const int pos = index.row();
     data.removeAt(pos);
     setStringList(data);
     emit layoutChanged();
@@ -56,7 +56,7 @@ void DataModel::clearData()
  */
 QString DataModel::getValue(int row) const
 {
-    QStringList data = stringList();
+    const QStringList data = stringList();
     QString value = "";
     if (row >= 0 && row < data.size())
     {

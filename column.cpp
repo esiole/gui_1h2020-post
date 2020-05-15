@@ -11,8 +11,8 @@ Column::Column(int bottom, int width) : QGraphicsObject()
     this->width = width;
     height = 0;
     deltaTimer = 200;
-    timer = new QTimer();
-    upperTimer = new QTimer();
+    timer = new QTimer(this);
+    upperTimer = new QTimer(this);
 
     connect(timer, &QTimer::timeout, this, &Column::timerRedraw);
     connect(upperTimer, &QTimer::timeout, this, &Column::upHeight);
@@ -20,8 +20,7 @@ Column::Column(int bottom, int width) : QGraphicsObject()
 
 Column::~Column()
 {
-    delete timer;
-    delete upperTimer;
+
 }
 
 /**
@@ -56,9 +55,7 @@ void Column::updateAnimation()
 void Column::timerRedraw()
 {
     upperTimer->stop();
-    int newHeight = getRandomHeight();
-    int deltaHeight = newHeight - height;
-    deltaUp = deltaHeight / static_cast<float>(deltaTimer) * 10;
+    deltaUp = (getRandomHeight() - height) / static_cast<float>(deltaTimer) * 10;
     upperTimer->start(10);
 }
 

@@ -6,10 +6,16 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
     setAcceptDrops(true);
 
     info = new MetaSongInfo();
+    maxMediaDuration = new QTime(0, 0);
+    currentMediaDuration = new QTime(0, 0);
+
+    dataModel = new DataModel(this);
+    ui->listView->setModel(dataModel);
+    ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
     int volume = 100;
     ui->sliderDuration->setValue(0);
     ui->labelVolume->setText(QString::number(volume) + "%");
@@ -22,10 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     player->setVolume(volume);
     playlist->setPlaybackMode(QMediaPlaylist::Loop);
 
-    maxMediaDuration = new QTime(0, 0);
-    currentMediaDuration = new QTime(0, 0);
-    dataModel = new DataModel(this);
-    scene = new QGraphicsScene();
+    scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -44,18 +47,15 @@ MainWindow::MainWindow(QWidget *parent)
         scene->addItem(column);
     }
 
-    ui->listView->setModel(dataModel);
-    ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
     connect(ui->listView, &QListView::doubleClicked, this, &MainWindow::doubleClickOnModelElement);
     connect(ui->playButton, &QPushButton::clicked, player, &QMediaPlayer::play);
     connect(ui->nextButton, &QPushButton::clicked, playlist, &QMediaPlaylist::next);
     connect(ui->prevButton, &QPushButton::clicked, playlist, &QMediaPlaylist::previous);
     connect(ui->pauseButton, &QPushButton::clicked, player, &QMediaPlayer::pause);
-    connect(ui->sliderDuration, &QSlider::sliderReleased, this, &MainWindow::moveSlider);
+    connect(ui->sliderDuration, &QSlider::sliderReleased, this, &MainWindow::moveSlider);   
     connect(ui->sliderVolume, &QSlider::valueChanged, this, &MainWindow::volumeChange);
     connect(ui->openFilesAction, &QAction::triggered, this, &MainWindow::openFiles);
-    connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearPlaylist);
+    connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearPlaylist); 
     connect(ui->delAction, &QAction::triggered, this, &MainWindow::deleteSong);
     connect(ui->metaAction, &QAction::triggered, info, &MetaSongInfo::show);
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
@@ -63,25 +63,33 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::clearMeta, info, &MetaSongInfo::clearInfo);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::durationChange);
     connect(player, &QMediaPlayer::stateChanged, this, &MainWindow::playerStateChange);
+    connect(this, &MainWindow::destroyed, info, &MetaSongInfo::close);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete maxMediaDuration;
+    delete currentMediaDuration;
 }
 
-void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 {
     event->accept();
 }
 
-void MainWindow::dropEvent(QDropEvent *event)
+void MainWindow::dropEvent(QDropEvent* event)
 {
     const QMimeData* mimeData = event->mimeData();
     if (mimeData->hasUrls())
     {
         addMediaToModel(mimeData->urls());
     }
+}
+
+void MainWindow::closeEvent(QCloseEvent*)
+{
+    info->close();
 }
 
 void MainWindow::doubleClickOnModelElement(const QModelIndex& index)
@@ -125,6 +133,26 @@ void MainWindow::moveSlider()
     player->setPosition(current);
 }
 
+void MainWindow::volumeChange(int volume)
+{
+    player->setVolume(volume);
+    ui->labelVolume->setText(QString::number(volume) + "%");
+}
+
+void MainWindow::openFiles()
+{
+    QList<QUrl> list = QFileDialog::getOpenFileUrls(this, "Добавить mp3 файлы в плейлист", QUrl(), "*.mp3");
+    addMediaToModel(list);
+}
+
+void MainWindow::clearPlaylist()
+{
+    dataModel->clearData();
+    playlist->clear();
+    clearMetaInfo();
+    emit stopColumn();
+}
+
 void MainWindow::deleteSong()
 {
     QModelIndex index  = ui->listView->currentIndex();
@@ -152,24 +180,17 @@ void MainWindow::deleteSong()
     player->play();
 }
 
-void MainWindow::volumeChange(int volume)
+void MainWindow::setMetaInfo()
 {
-    player->setVolume(volume);
-    ui->labelVolume->setText(QString::number(volume) + "%");
-}
-
-void MainWindow::openFiles()
-{
-    QList<QUrl> list = QFileDialog::getOpenFileUrls(this, "Добавить mp3 файлы в плейлист", QUrl(), "*.mp3");
-    addMediaToModel(list);
-}
-
-void MainWindow::clearPlaylist()
-{
-    dataModel->clearData();
-    playlist->clear();
-    clearMetaInfo();
-    emit stopColumn();
+    QString author = player->metaData(QMediaMetaData::Author).toString();
+    QString title = player->metaData(QMediaMetaData::Title).toString();
+    QString album = player->metaData(QMediaMetaData::AlbumTitle).toString();
+    QString year = player->metaData(QMediaMetaData::Year).toString();
+    emit setMeta(author, title, album, year);
+    calculationTime(maxMediaDuration, player->metaData(QMediaMetaData::Duration).toLongLong());
+    QString time = QString::number(maxMediaDuration->minute()) + ":" + QString::number(maxMediaDuration->second());
+    ui->labelMaxDuration->setText(time);
+    ui->labelFileName->setText(dataModel->getValue(playlist->currentIndex()));
 }
 
 void MainWindow::playerStateChange(QMediaPlayer::State state)
@@ -182,19 +203,6 @@ void MainWindow::playerStateChange(QMediaPlayer::State state)
     {
         emit stopColumn();
     }
-}
-
-void MainWindow::setMetaInfo()
-{
-    QString author = player->metaData(QMediaMetaData::Author).toString();
-    QString title = player->metaData(QMediaMetaData::Title).toString();
-    QString album = player->metaData(QMediaMetaData::AlbumTitle).toString();
-    QString year = player->metaData(QMediaMetaData::Year).toString();
-    emit setMeta(author, title, album, year);
-    calculationTime(maxMediaDuration, player->metaData(QMediaMetaData::Duration).toLongLong());
-    QString time = QString::number(maxMediaDuration->minute()) + ":" + QString::number(maxMediaDuration->second());
-    ui->labelMaxDuration->setText(time);
-    ui->labelFileName->setText(dataModel->getValue(playlist->currentIndex()));
 }
 
 void MainWindow::calculationTime(QTime* time, qint64 millsec)
