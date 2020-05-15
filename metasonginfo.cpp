@@ -13,6 +13,13 @@ MetaSongInfo::~MetaSongInfo()
     delete ui;
 }
 
+/**
+ * @brief MetaSongInfo::setInfo устанавливает мета информацию о файле на форму
+ * @param author исполнитель
+ * @param title название
+ * @param album альбом
+ * @param year год выхода
+ */
 void MetaSongInfo::setInfo(const QString &author, const QString &title, const QString &album, const QString &year)
 {
     ui->labelPlayer->setText(author);
@@ -21,6 +28,9 @@ void MetaSongInfo::setInfo(const QString &author, const QString &title, const QS
     ui->labelYear->setText(year);
 }
 
+/**
+ * @brief MetaSongInfo::clearInfo удаляет всю информацию из формы
+ */
 void MetaSongInfo::clearInfo()
 {
     ui->labelPlayer->setText("");
