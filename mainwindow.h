@@ -65,5 +65,6 @@ private:
     void calculationTime(QTime* time, qint64 millsec);
     void clearMetaInfo();
     void addMediaToModel(const QList<QUrl> &list);
+    QString getStringFromTime(int minutes, int seconds) const;
 };
 #endif // MAINWINDOW_H

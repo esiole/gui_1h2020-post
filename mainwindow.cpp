@@ -101,21 +101,7 @@ void MainWindow::doubleClickOnModelElement(const QModelIndex& index)
 void MainWindow::durationChange(qint64 duration)
 {
     calculationTime(currentMediaDuration, duration);
-    QString time = "";
-    int second = currentMediaDuration->second();
-    int minute = currentMediaDuration->minute();
-    if (second < 10)
-    {
-        if (second == 0)
-        {
-            time = QString::number(currentMediaDuration->minute()) + ":00";
-        }
-        time = QString::number(minute) + ":0" + QString::number(second);
-    }
-    else
-    {
-        time = QString::number(minute) + ":" + QString::number(second);
-    }
+    QString time = getStringFromTime(currentMediaDuration->minute(), currentMediaDuration->second());
     ui->labelCurrentDuration->setText(time);
     int current = currentMediaDuration->msecsSinceStartOfDay();
     int max = maxMediaDuration->msecsSinceStartOfDay();
@@ -188,8 +174,7 @@ void MainWindow::setMetaInfo()
     QString year = player->metaData(QMediaMetaData::Year).toString();
     emit setMeta(author, title, album, year);
     calculationTime(maxMediaDuration, player->metaData(QMediaMetaData::Duration).toLongLong());
-    QString time = QString::number(maxMediaDuration->minute()) + ":" + QString::number(maxMediaDuration->second());
-    ui->labelMaxDuration->setText(time);
+    ui->labelMaxDuration->setText(getStringFromTime(maxMediaDuration->minute(), maxMediaDuration->second()));
     ui->labelFileName->setText(dataModel->getValue(playlist->currentIndex()));
 }
 
@@ -238,4 +223,22 @@ void MainWindow::addMediaToModel(const QList<QUrl> &list)
             }
         }
     }
+}
+
+QString MainWindow::getStringFromTime(int minutes, int seconds) const
+{
+    QString time = "";
+    if (seconds < 10)
+    {
+        if (seconds == 0)
+        {
+            time = QString::number(currentMediaDuration->minute()) + ":00";
+        }
+        time = QString::number(minutes) + ":0" + QString::number(seconds);
+    }
+    else
+    {
+        time = QString::number(minutes) + ":" + QString::number(seconds);
+    }
+    return time;
 }
