@@ -81,7 +81,7 @@ void Column::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     QPolygon polygon;
     polygon << QPoint(0, bottom - height) << QPoint(0, bottom) << QPoint(width, bottom) << QPoint(width, bottom - height);
-    painter->setBrush(Qt::red);
+    painter->setBrush(Qt::blue);
     painter->drawPolygon(polygon);
 }
 
