@@ -28,3 +28,4 @@
 ![](https://github.com/esiole/gui_1h2020-post/raw/master/examples/3.png)
 ![](https://github.com/esiole/gui_1h2020-post/raw/master/examples/4.png)
 ![](https://github.com/esiole/gui_1h2020-post/raw/master/examples/5.png)
+![](https://github.com/esiole/gui_1h2020-post/raw/master/examples/6.png)
