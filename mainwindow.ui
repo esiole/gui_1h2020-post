@@ -154,7 +154,7 @@
             </font>
            </property>
            <property name="text">
-            <string>File Name</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -185,7 +185,7 @@
             </font>
            </property>
            <property name="text">
-            <string>000:00</string>
+            <string/>
            </property>
            <property name="textFormat">
             <enum>Qt::AutoText</enum>
@@ -223,7 +223,7 @@
             </font>
            </property>
            <property name="text">
-            <string>999:99</string>
+            <string/>
            </property>
           </widget>
          </item>

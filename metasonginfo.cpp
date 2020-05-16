@@ -4,6 +4,7 @@
 MetaSongInfo::MetaSongInfo(QWidget *parent) : QWidget(parent), ui(new Ui::MetaSongInfo)
 {
     ui->setupUi(this);
+    this->setLayout(ui->formLayout);
 }
 
 MetaSongInfo::~MetaSongInfo()
