@@ -4,17 +4,9 @@
 #include <QMainWindow>
 #include <QDropEvent>
 #include <QMimeData>
-#include <QList>
-#include <QUrl>
-#include <QFileInfo>
-#include <QListView>
-#include <QMediaPlayer>
-#include <QMediaPlaylist>
 #include <QMediaMetaData>
 #include <QTime>
 #include <QFileDialog>
-#include <QGraphicsScene>
-#include <QDebug>
 
 #include "datamodel.h"
 #include "column.h"
@@ -31,21 +23,22 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
-
     virtual void dragEnterEvent(QDragEnterEvent* event) override;
-    virtual void dropEvent(QDropEvent *event) override;
+    virtual void dropEvent(QDropEvent* event) override;
+    virtual void closeEvent(QCloseEvent* event) override;
+    virtual void resizeEvent(QResizeEvent* event) override;
 
-public slots:
+private slots:
     void doubleClickOnModelElement(const QModelIndex& index);
-    //void setMetaInfo();
     void durationChange(qint64 duration);
     void moveSlider();
-    void deleteSong();
     void volumeChange(int volume);
     void openFiles();
     void clearPlaylist();
-    void playerStateChange(QMediaPlayer::State state);
+    void deleteSong();
     void setMetaInfo();
+    void playerStateChange(QMediaPlayer::State state);
+    void hideView();
 
 signals:
     void stopColumn();
@@ -57,14 +50,15 @@ private:
     Ui::MainWindow *ui;
     DataModel* dataModel;
     QMediaPlayer* player;
-    QMediaPlaylist* playlist;
     QTime* maxMediaDuration;
     QTime* currentMediaDuration;
     QGraphicsScene* scene;
     MetaSongInfo* info;
+    const int columnCount;
 
     void calculationTime(QTime* time, qint64 millsec);
     void clearMetaInfo();
     void addMediaToModel(const QList<QUrl> &list);
+    QString getStringFromTime(int minutes, int seconds) const;
 };
 #endif // MAINWINDOW_H
