@@ -1,9 +1,7 @@
 #include "metasonginfo.h"
 #include "ui_metasonginfo.h"
 
-MetaSongInfo::MetaSongInfo(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::MetaSongInfo)
+MetaSongInfo::MetaSongInfo(QWidget *parent) : QWidget(parent), ui(new Ui::MetaSongInfo)
 {
     ui->setupUi(this);
 }

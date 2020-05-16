@@ -5,7 +5,7 @@
  * @param bottom уровень дна столбика (максимальная высота)
  * @param width ширина столбика
  */
-Column::Column(int bottom, int width) : QGraphicsObject(), bottom(bottom), width(width), deltaTimer(200)
+Column::Column(int width, int bottom) : QGraphicsObject(), bottom(bottom), width(width), deltaTimer(200)
 {
     height = 0;
     timer = new QTimer(this);
@@ -18,6 +18,18 @@ Column::Column(int bottom, int width) : QGraphicsObject(), bottom(bottom), width
 Column::~Column()
 {
 
+}
+
+/**
+ * @brief Column::setNewGeometry изменяет максимальные размеры столбика
+ * @param width ширина столбика
+ * @param height максимальная высота
+ */
+void Column::setNewGeometry(int width, int height)
+{
+    this->width = width;
+    this->bottom = height;
+    update(0, 0, width, bottom);
 }
 
 /**

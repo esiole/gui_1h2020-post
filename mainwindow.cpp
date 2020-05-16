@@ -1,11 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), columnCount(10)
 {
     ui->setupUi(this);
+    centralWidget()->setLayout(ui->horizontalLayout_5);
+    this->resize(100, 100);
     setAcceptDrops(true);
 
     info = new MetaSongInfo();
@@ -33,12 +33,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     const int width = ui->graphicsView->width();
     const int height = ui->graphicsView->height();
-    const int columnCount = 10;
     const int columnWidth = (width - 5 * (columnCount + 1)) / columnCount;
     scene->setSceneRect(0, 0, width, height);
     for (int i = 0, x = 5; i < columnCount; i++, x += columnWidth + 5)
     {
-        Column* column = new Column(100, columnWidth);
+        Column* column = new Column(columnWidth, height);
         column->setPos(x, 0);
         connect(this, &MainWindow::startColumn, column, &Column::enableAnimation);
         connect(this, &MainWindow::stopColumn, column, &Column::disableAnimation);
@@ -57,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearPlaylist); 
     connect(ui->delAction, &QAction::triggered, this, &MainWindow::deleteSong);
     connect(ui->metaAction, &QAction::triggered, info, &MetaSongInfo::show);
+    connect(ui->hideAction, &QAction::triggered, this, &MainWindow::hideView);
     connect(player, QOverload<>::of(&QMediaObject::metaDataChanged), this, &MainWindow::setMetaInfo);
     connect(this, &MainWindow::setMeta, info, &MetaSongInfo::setInfo);
     connect(this, &MainWindow::clearMeta, info, &MetaSongInfo::clearInfo);
@@ -89,6 +89,21 @@ void MainWindow::dropEvent(QDropEvent* event)
 void MainWindow::closeEvent(QCloseEvent*)
 {
     info->close();
+}
+
+void MainWindow::resizeEvent(QResizeEvent*)
+{
+    const int width = ui->graphicsView->width();
+    const int height = ui->graphicsView->height();
+    const int columnWidth = (width - 5 * (columnCount + 1)) / columnCount;
+    scene->setSceneRect(0, 0, width, height);
+    QList<QGraphicsItem*> list = scene->items();
+    for (int i = 0, x = 5; i < columnCount; i++, x += columnWidth + 5)
+    {
+        Column* column = dynamic_cast<Column*>(list.at(i));
+        column->setNewGeometry(columnWidth, height);
+        column->setPos(x, 0);
+    }
 }
 
 void MainWindow::doubleClickOnModelElement(const QModelIndex& index)
@@ -200,6 +215,26 @@ void MainWindow::playerStateChange(QMediaPlayer::State state)
     {
         emit stopColumn();
     }
+}
+
+/**
+ * @brief MainWindow::hideView скрыть/показать представление, отображающее модель данных
+ * нужна эмитация события resize для перерисовки столбиков на QGraphicsScene
+ */
+void MainWindow::hideView()
+{
+    if (ui->tableView->isVisible())
+    {
+        ui->tableView->hide();
+        ui->hideAction->setText("Показать");
+    }
+    else
+    {
+        ui->tableView->show();
+        ui->hideAction->setText("Скрыть");
+    }
+    this->resize(this->width() + 1, this->height() + 1);
+    this->resize(this->width() - 1, this->height() - 1);
 }
 
 /**

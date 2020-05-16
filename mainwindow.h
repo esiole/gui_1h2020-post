@@ -26,6 +26,7 @@ public:
     virtual void dragEnterEvent(QDragEnterEvent* event) override;
     virtual void dropEvent(QDropEvent* event) override;
     virtual void closeEvent(QCloseEvent* event) override;
+    virtual void resizeEvent(QResizeEvent* event) override;
 
 private slots:
     void doubleClickOnModelElement(const QModelIndex& index);
@@ -37,6 +38,7 @@ private slots:
     void deleteSong();
     void setMetaInfo();
     void playerStateChange(QMediaPlayer::State state);
+    void hideView();
 
 signals:
     void stopColumn();
@@ -52,6 +54,7 @@ private:
     QTime* currentMediaDuration;
     QGraphicsScene* scene;
     MetaSongInfo* info;
+    const int columnCount;
 
     void calculationTime(QTime* time, qint64 millsec);
     void clearMetaInfo();

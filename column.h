@@ -11,8 +11,9 @@ class Column : public QGraphicsObject
     Q_OBJECT
 
 public:
-    Column(int maxHeight, int width);
+    Column(int width, int maxHeight);
     ~Column() override;
+    void setNewGeometry(int width, int height);
 
 public slots:
     void enableAnimation();
@@ -24,8 +25,8 @@ private slots:
     void upHeight();
 
 private:
-    const int bottom;       // максимально возможная высота столбика (уровень дна)
-    const int width;        // ширина столбика
+    int bottom;             // максимально возможная высота столбика (уровень дна)
+    int width;              // ширина столбика
     int height;             // текущая высота столбика
     const int deltaTimer;   // время в мс для таймера генерации высоты нового уровня
     float deltaUp;          // расстояние для движения на один тик для плавной анимации
